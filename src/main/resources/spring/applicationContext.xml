@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:c="http://www.springframework.org/schema/c"
+       xmlns:cache="http://www.springframework.org/schema/cache"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+       xmlns:jee="http://www.springframework.org/schema/jee"
+       xmlns:lang="http://www.springframework.org/schema/lang"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-4.3.xsd
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.3.xsd
+		http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-4.3.xsd
+		http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache-4.3.xsd
+		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.3.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/lang http://www.springframework.org/schema/lang/spring-lang-4.3.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd ">
+
+
+        <!--1.aop是基于代理完成的，所以我们要激活我们自动代理-->
+        <aop:aspectj-autoproxy/>
+
+        <!--2.注册一个切面具体要使用得类-->
+        <bean class="com.cn.advice.BeforeAdvice" id="beforeAdvice">
+
+        </bean>
+
+        <bean class="com.cn.service.ProviderService" id="providerService1">
+
+        </bean>
+
+     <bean class="com.cn.advice.AfterAdvice" id="afterAdvice">
+
+
+     </bean>
+    <bean class="com.cn.advice.AfterReturningAdvice" id="afterReturningAdvice">
+
+    </bean>
+    <bean class="com.cn.service.HelloService" id="helloService"></bean>
+
+    <bean class="com.cn.advice.ExceptionAdvice" id="exceptionAdvice"></bean>
+
+    <bean class="com.cn.advice.AroundAdvice" id="aroundAdvice"></bean>
+
+    <!--3.配置切入点等信息-->
+    <aop:config>
+        <aop:aspect id="beforeAspect" ref="beforeAdvice">
+            <!--aop:before:表明他确实是前置通知
+            method:指明它使用哪个方法来切
+            pointcut：切入点，要什么包下面的什么类下面的什么方法
+
+            -->
+          <aop:before method="methodBefore" pointcut="execution(* com.cn.service.*.*(..))"/>
+            <aop:before method="before" pointcut="execution(* com.cn.service.*.*(..))"/>
+
+        </aop:aspect>
+
+        <aop:aspect id="afterAspect" ref="afterAdvice">
+            <!--
+            第一个*是service下面的任意的类
+            第二个*是任何的方法名都可以
+            (..)任意参数，没有参数，无数个也行
+            -->
+            <aop:after method="after" pointcut="execution(* com.cn.service.*.*(..))"/>
+        </aop:aspect>
+        <aop:aspect id="nice" ref="afterReturningAdvice">
+            <!--
+            returning:可以对返回值进行绑定
+            -->
+           <aop:after-returning method="afterReturning" pointcut="execution(* com..*.*.*(..))" returning="re"></aop:after-returning>
+        </aop:aspect>
+
+        <aop:aspect id="ex" ref="exceptionAdvice">
+            <!--com..是com后面的任意包（无论多少层）-->
+            <aop:after-throwing method="ext" pointcut="execution(* com..*.*.*(..))"></aop:after-throwing>
+
+
+        </aop:aspect>
+
+        <aop:aspect id="around" ref="aroundAdvice">
+            <aop:around method="around" pointcut="execution(* com..*.*.*(..))"></aop:around>
+        </aop:aspect>
+
+    </aop:config>
+
+
+
+
+</beans>
